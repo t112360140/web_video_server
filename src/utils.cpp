@@ -40,16 +40,19 @@ namespace web_video_server
 
 std::optional<rmw_qos_profile_t> get_qos_profile_from_name(const std::string name)
 {
+  rmw_qos_profile_t profile;
   if (name == "default") {
-    return rmw_qos_profile_default;
+    profile = rmw_qos_profile_default;
   }
   if (name == "system_default") {
-    return rmw_qos_profile_system_default;
+    profile = rmw_qos_profile_system_default;
   }
   if (name == "sensor_data") {
-    return rmw_qos_profile_sensor_data;
+    profile = rmw_qos_profile_sensor_data;
   }
-  return std::nullopt;
+  profile.depth = 1;
+  profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
+  return profile;
 }
 
 }  // namespace web_video_server
