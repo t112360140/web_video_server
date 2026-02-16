@@ -180,6 +180,19 @@ void ImageTransportStreamerBase::image_callback(const sensor_msgs::msg::Image::C
   if (inactive_) {
     return;
   }
+  
+  if (target_fps_ > 0) {
+    // 使用 ROS 訊息的時間戳進行判斷
+    rclcpp::Time current_time = msg->header.stamp;
+    double elapsed = (current_time - last_sent_time_).seconds();
+
+    // 如果時間差小於目標間隔 (1/fps)，直接拋棄這幀。
+    // 減去 0.001 秒是為了消除浮點數運算的微小誤差，確保頻率穩定。
+    if (elapsed < (1.0 / target_fps_ - 0.001)) {
+      return; 
+    }
+    last_sent_time_ = current_time;
+  }
 
   auto node = lock_node();
   if (!node) {

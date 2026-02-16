@@ -51,8 +51,16 @@ StreamerBase::StreamerBase(
   std::string logger_name)
 : connection_(connection), request_(request), node_(std::move(node)),
   logger_(node_.lock()->get_logger().get_child(logger_name)), inactive_(false),
-  topic_(request.get_query_param_value_or_default("topic", ""))
+  topic_(request.get_query_param_value_or_default("topic", "")),
+  last_sent_time_(0, 0, RCL_ROS_TIME) // 初始化時間
 {
+  // 從 URL 讀取 fps 參數，預設 0 代表不限制
+  std::string fps_str = request.get_query_param_value_or_default("fps", "0");
+  try {
+    target_fps_ = std::stod(fps_str);
+  } catch (...) {
+    target_fps_ = 0;
+  }
 }
 
 rclcpp::Node::SharedPtr StreamerBase::lock_node() const

@@ -106,6 +106,9 @@ protected:
   rclcpp::Logger logger_;
   bool inactive_;
   std::string topic_;
+  
+  double target_fps_;
+  rclcpp::Time last_sent_time_;
 };
 
 /**
